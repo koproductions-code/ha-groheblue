@@ -1,0 +1,21 @@
+tap_water:
+  fields:
+    type:
+      required: true
+      name: Type
+      description: The type of the water (1, 2, 3) corresponding to (still, medium, sparkling)
+      example: 1
+      selector:
+        number:
+          min: 1
+          max: 3
+    amount:
+      required: true
+      name: Amount
+      description: The amount of water in milliliters in steps of 50
+      example: 50
+      selector:
+        number:
+          min: 50
+          max: 1000
+          step: 50

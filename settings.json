@@ -1,0 +1,18 @@
+{
+    "API": {
+        "API_KEY": "1234"
+    },
+    "CREDENTIALS": {
+        "EMAIL": "kirstin.weber25@gmail.com",
+        "PASSWORD": "Uut7fvdG<aKK"
+    },
+    "DEVICE": {
+        "APPLIANCE_ID": "1e7f471f-3b1e-40e5-a665-c1aaa898eae9",
+        "LOCATION_ID": 2379072,
+        "ROOM_ID": 4865589
+    },
+    "SERVER": {
+        "BIND_ADDRESS": "0.0.0.0",
+        "BIND_PORT": 8000
+    }
+}

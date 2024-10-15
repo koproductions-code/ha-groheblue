@@ -43,8 +43,8 @@ class GroheSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self._attr_name = name
         self._attr_unique_id = f"{entry_id}_{appliance_id}_{config['key']}"
-        self._attr_unit_of_measurement = config["unit"]
-        #self._attr_native_unit_of_measurement = config["unit"]
+        #self._attr_unit_of_measurement = config["unit"]
+        self._attr_native_unit_of_measurement = config["unit"]
         
         self._config = config
         self._appliance_id = appliance_id

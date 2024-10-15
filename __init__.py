@@ -91,8 +91,6 @@ class GroheDataUpdateCoordinator(DataUpdateCoordinator):
         measurement_data = device_data['data_latest']['measurement']
         state_data = device_data['state']
 
-        logging.info(measurement_data)
-
         return {
             "serial_number": self.serial_number,  # Include serial number in returned data
             "remaining_co2": measurement_data['remaining_co2'],

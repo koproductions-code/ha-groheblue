@@ -1,0 +1,5 @@
+{
+    "services": {
+        "tap_water": {"service": "mdi:water-pump"}
+    }
+}

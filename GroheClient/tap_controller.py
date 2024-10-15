@@ -6,6 +6,7 @@ import asyncio
 import requests
 
 from ..settings import get_setting as _
+from .base import GroheClient
 
 DEVICE_LOCATION_ID = _("DEVICE/LOCATION_ID")
 DEVICE_APPLIANCE_ID = _("DEVICE/APPLIANCE_ID")
@@ -30,7 +31,7 @@ def get_auth_header(access_token: str) -> str:
     return f'Bearer {access_token}'
 
 
-async def execute_tap_command(tap_type: int, amount: int, access_token, tries=0) -> bool:
+async def execute_tap_command(tap_type: int, amount: int, myclient: GroheClient, tries=0) -> bool:
     """
     Executes the command for the given tap type and amount.
 
@@ -46,7 +47,7 @@ async def execute_tap_command(tap_type: int, amount: int, access_token, tries=0)
     async def send_command():
         headers = {
             "Content-Type": "application/json",
-            "Authorization": get_auth_header(access_token),
+            "Authorization": get_auth_header(myclient.get_access_token()),
         }
         data = {
             "type": None,

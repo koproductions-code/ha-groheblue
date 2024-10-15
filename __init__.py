@@ -6,7 +6,7 @@ from datetime import timedelta
 import logging
 
 from .GroheClient.base import GroheClient
-from .GroheClient.tap_controller import get_dashboard_data
+from .GroheClient.tap_controller import get_dashboard_data, execute_tap_command
 
 DOMAIN = "groheblue"
 _LOGGER = logging.getLogger(__name__)
@@ -53,6 +53,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     # Forward the setup of the sensor platform to Home Assistant
     await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "binary_sensor"])
+
+
+    # Register Tap Water Service
+    async def handle_tap_water(call):
+        tap_type = call.data.get('type')
+        amount = call.data.get('amount')
+
+        await execute_tap_command(tap_type, amount, client)
+    
+    hass.services.async_register('groheblue', 'tap_water', handle_tap_water)
 
     return True
 

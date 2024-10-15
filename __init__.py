@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         tap_type = call.data.get('type')
         amount = call.data.get('amount')
 
-        await execute_tap_command(tap_type, amount)
+        await execute_tap_command(tap_type, amount, client.get_access_token())
 
     hass.services.async_register(DOMAIN, 'tap_water', handle_tap_water)
     return True

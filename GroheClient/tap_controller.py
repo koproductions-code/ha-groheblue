@@ -30,7 +30,7 @@ def get_auth_header(access_token: str) -> str:
     return f'Bearer {access_token}'
 
 
-async def execute_tap_command(tap_type: int, amount: int, tries=0) -> bool:
+async def execute_tap_command(tap_type: int, amount: int, access_token, tries=0) -> bool:
     """
     Executes the command for the given tap type and amount.
 
@@ -46,7 +46,7 @@ async def execute_tap_command(tap_type: int, amount: int, tries=0) -> bool:
     async def send_command():
         headers = {
             "Content-Type": "application/json",
-            "Authorization": get_auth_header(get_access_token()),
+            "Authorization": get_auth_header(access_token),
         }
         data = {
             "type": None,

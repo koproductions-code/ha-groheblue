@@ -47,7 +47,7 @@ async def execute_tap_command(tap_type: int, amount: int, myclient: GroheClient,
     async def send_command():
         headers = {
             "Content-Type": "application/json",
-            "Authorization": get_auth_header(myclient.get_access_token()),
+            "Authorization": get_auth_header(await myclient.get_access_token()),
         }
         data = {
             "type": None,

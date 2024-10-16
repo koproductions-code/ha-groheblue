@@ -2,6 +2,7 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.device_registry import DeviceEntryType
 
 from . import DOMAIN, GroheDataUpdateCoordinator
 
@@ -44,8 +45,11 @@ class GroheSensor(CoordinatorEntity, SensorEntity):
         self._attr_name = name
         self._attr_unique_id = f"{entry_id}_{appliance_id}_{config['key']}"
         #self._attr_unit_of_measurement = config["unit"]
-        self._attr_native_unit_of_measurement = config["unit"]
-        
+        if config["unit"] != "date":
+            self._attr_native_unit_of_measurement = config["unit"]
+        else:
+            self._attr_unit_of_measurement = config["unit"]
+
         self._config = config
         self._appliance_id = appliance_id
 
@@ -64,5 +68,5 @@ class GroheSensor(CoordinatorEntity, SensorEntity):
             "manufacturer": "Grohe",
             "model": "Blue Home",
             "hw_version": serial_number,  # Include serial number here
-            "entry_type": "service",
+            "entry_type": DeviceEntryType.SERVICE,
         }

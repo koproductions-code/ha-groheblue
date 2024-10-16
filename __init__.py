@@ -2,6 +2,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers import device_registry as dr
+from homeassistant.exceptions import HomeAssistantError
 from datetime import timedelta
 import logging
 
@@ -10,6 +11,31 @@ from .GroheClient.tap_controller import get_dashboard_data, execute_tap_command
 
 DOMAIN = "groheblue"
 _LOGGER = logging.getLogger(__name__)
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Unload a config entry."""
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, ["sensor", "binary_sensor"])
+
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id)
+
+    return unload_ok
+
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Reload a config entry."""
+    await async_unload_entry(hass, entry)
+    await async_setup_entry(hass, entry)
+
+async def async_reload_integration(call):
+    """Handle the reload service call."""
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        await async_reload_entry(hass, entry)
+
+async def async_setup(hass: HomeAssistant, config: dict):
+    """Set up the Grohe Blue component."""
+    # Register the reload service
+    hass.services.async_register(DOMAIN, "reload", async_reload_integration)
+    return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up the Grohe Blue component with multiple devices and serial numbers."""
@@ -21,7 +47,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await client._initialize_tokens()
 
     # Fetch data once to identify all devices and their serial numbers
-    data = await get_dashboard_data(client.get_access_token())
+    data = await get_dashboard_data(await client.get_access_token())
     devices = data['locations'][0]['rooms'][0]['appliances']
 
     coordinators = {}
@@ -83,7 +109,10 @@ class GroheDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Fetch data for this specific appliance ID from GroheClient."""
-        data = await get_dashboard_data(self.client.get_access_token())
+        data = await get_dashboard_data(await self.client.get_access_token())
+        if ("locations" not in data):
+            raise HomeAssistantError(f"Error fetching the data {data}")
+
         device_data = next(
             device for device in data['locations'][0]['rooms'][0]['appliances']
             if device['appliance_id'] == self.appliance_id

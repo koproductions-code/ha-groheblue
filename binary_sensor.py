@@ -2,6 +2,7 @@ from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.device_registry import DeviceEntryType
 
 from . import DOMAIN, GroheDataUpdateCoordinator
 
@@ -48,5 +49,5 @@ class GroheBinarySensor(CoordinatorEntity, BinarySensorEntity):
             "manufacturer": "Grohe",
             "model": "Blue Home",
             "hw_version": serial_number,
-            "entry_type": "service",
+            "entry_type": DeviceEntryType.SERVICE,
         }

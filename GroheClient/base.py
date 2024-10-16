@@ -24,22 +24,22 @@ class GroheClient:
             logging.error(f"Could not get initial tokens: {e}")
             exit(1)
 
-    def refresh_tokens(self):
+    async def refresh_tokens(self):
         """
         Refresh the access and refresh tokens.
         """
         logging.info("Refreshing tokens")
-        tokens = get_refresh_tokens(self.refresh_token)
+        tokens = await get_refresh_tokens(self.refresh_token)
         self.access_token = tokens['access_token']
         self.refresh_token = tokens['refresh_token']
         self.access_token_expiring_date = datetime.now() + timedelta(seconds=tokens['access_token_expires_in'] - 60)
 
-    def get_access_token(self) -> str:
+    async def get_access_token(self) -> str:
         """
         Get the access token. Refresh the tokens if they are expired.
         Returns: The access token.
         """
         # Refresh the tokens if they are expired
         if datetime.now() > self.access_token_expiring_date:
-            self.refresh_tokens()
+            await self.refresh_tokens()
         return self.access_token

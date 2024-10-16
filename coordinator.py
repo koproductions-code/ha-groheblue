@@ -7,7 +7,9 @@ from datetime import timedelta
 
 from .GroheClient.base import GroheClient
 from .GroheClient.tap_controller import get_dashboard_data
-from . import _LOGGER
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class GroheDataUpdateCoordinator(DataUpdateCoordinator):

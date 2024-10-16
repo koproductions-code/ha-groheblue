@@ -1,4 +1,7 @@
 tap_water:
+  target:
+    device:
+      integration: groheblue
   fields:
     type:
       required: true

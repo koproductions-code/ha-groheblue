@@ -6,8 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry as dr
 
-from .GroheClient.base import GroheClient
-from .GroheClient.tap_controller import get_dashboard_data, execute_tap_command
+from groheblue import GroheClient
 
 from .coordinator import GroheDataUpdateCoordinator
 
@@ -54,17 +53,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     password = entry.data.get("password")
 
     client = GroheClient(email=email, password=password)
-    await client._initialize_tokens()
+    await client.login()
 
-    data = await get_dashboard_data(await client.get_access_token())
-    devices = data["locations"][0]["rooms"][0]["appliances"]
+    devices = await client.get_devices()
 
     coordinators = {}
 
     for device in devices:
-        appliance_id = device["appliance_id"]
-        name = device["name"]
-        serial_number = device["serial_number"]
+        appliance_id = device.appliance_id
+        name = device.name
+        serial_number = device.serial_number
 
         coordinator = GroheDataUpdateCoordinator(
             hass, client, appliance_id, serial_number
@@ -79,7 +77,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             name=name,
             manufacturer="Grohe",
             model="Blue Home",
-            sw_version=device.get("version"),
+            sw_version=device.version,
             hw_version=serial_number,
         )
 
@@ -90,10 +88,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
 
     async def handle_tap_water(call):
+        target = call.data.get("device_id")[0]
         tap_type = call.data.get("type")
         amount = call.data.get("amount")
 
-        await execute_tap_command(tap_type, amount, client)
+        entry = device_registry.async_get(target)
+        grohe_id = next(iter(entry.identifiers))[1]
+
+        devices = await client.get_devices()
+        device = next(
+            (device for device in devices if device.appliance_id == grohe_id), None
+        )
+
+        await client.dispense(device, tap_type, amount)
 
     hass.services.async_register("groheblue", "tap_water", handle_tap_water)
 

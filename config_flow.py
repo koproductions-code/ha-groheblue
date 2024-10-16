@@ -1,8 +1,8 @@
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import callback
 
 DOMAIN = "groheblue"
+
 
 class MyIntegrationConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for My Integration."""
@@ -13,9 +13,13 @@ class MyIntegrationConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             return self.async_create_entry(title=user_input["email"], data=user_input)
 
-        data_schema = vol.Schema({
-            vol.Required("email"): str,
-            vol.Required("password"): str,
-        })
+        data_schema = vol.Schema(
+            {
+                vol.Required("email"): str,
+                vol.Required("password"): str,
+            }
+        )
 
-        return self.async_show_form(step_id="user", data_schema=data_schema, errors=errors)
+        return self.async_show_form(
+            step_id="user", data_schema=data_schema, errors=errors
+        )

@@ -3,7 +3,7 @@
 This is a HomeAssistant integration to interact with Grohe Blue Home devices. It is fairly new but functional. If you encounter any bugs, feel free to create an issue. 
 
 ## Disclaimer
-I am not affiliated with Grohe or the Grohe app in any way. The integration is based on the python-package called "groheblue", which is based on the undocumented Grohe-API. If Grohe decides to change the API in any way, this could break the integration. 
+I am not affiliated with Grohe or the Grohe app in any way. The integration is based on the python-package called "groheblue", which is based on the undocumented Grohe-API. If Grohe decides to change the API in any way, this could break the integration. Even tough I tested this integration with my device for several weeks without any malfunction, I am not liable for any potential issues, malfunctions, or damages arising from using this integration. Use at your own risk!
 
 ## Usage
 1. Open the HACS panel in your Home Assistant frontend.

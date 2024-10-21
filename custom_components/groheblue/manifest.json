@@ -7,9 +7,6 @@
         "@koproductions"
     ],
     "requirements": [
-        "beautifulsoup4==4.11.1",
-        "requests==2.32.3",
-        "simplejson==3.18.0",
         "groheblue==0.1.2"
     ],
     "integration_type": "hub",

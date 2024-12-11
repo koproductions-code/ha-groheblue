@@ -23,13 +23,14 @@ SENSOR_CONFIG = {
     "Pump Count": {"key": "pump_count", "unit": ""},
     "Pump Running Time": {"key": "pump_running_time", "unit": "min"},
     "Operating Time": {"key": "operating_time", "unit": "min"},
-    "Water Running Time (Still)": {"key": "water_running_time_still", "unit": "s"},
+    "Water Running Time (Still)": {"key": "water_running_time_still", "unit": "min"},
     "Water Running Time (Carbonated)": {
         "key": "water_running_time_carbonated",
-        "unit": "s",
+        "unit": "min",
     },
-    "Water Running Time (Medium)": {"key": "water_running_time_medium", "unit": "s"},
+    "Water Running Time (Medium)": {"key": "water_running_time_medium", "unit": "min"},
     "System Error Bitfield": {"key": "System_error_bitfield", "unit": ""},
+    "Time Since Last Withdrawal": {"key": "time_since_last_withdrawal", "unit": "min"},
 }
 
 

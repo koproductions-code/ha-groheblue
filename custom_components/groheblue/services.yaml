@@ -22,3 +22,76 @@ tap_water:
           min: 50
           max: 1000
           step: 50
+custom_command:
+  target:
+    device:
+      integration: groheblue
+  fields:
+    co2_status_reset:
+      required: false
+      name: CO2 Status Reset
+      description: Reset the CO2 status
+      example: False
+      selector:
+        boolean: {}
+    tap_type:
+      required: false
+      name: Tap Type
+      description: The type of the tap
+      example: None
+      selector:
+        number:
+          min: 1
+          max: 3
+    cleaning_mode:
+      required: false
+      name: Cleaning Mode
+      description: Enable or disable cleaning mode
+      example: False
+      selector:
+        boolean: {}
+    filter_status_reset:
+      required: false
+      name: Filter Status Reset
+      description: Reset the filter status
+      example: False
+      selector:
+        boolean: {}
+    get_current_measurement:
+      required: false
+      name: Get Current Measurement
+      description: Get the current measurement
+      example: False
+      selector:
+        boolean: {}
+    tap_amount:
+      required: false
+      name: Tap Amount
+      description: The amount of water to tap
+      example: None
+      selector:
+        number:
+          min: 50
+          max: 1000
+          step: 50
+    factory_reset:
+      required: false
+      name: Factory Reset
+      description: Perform a factory reset
+      example: False
+      selector:
+        boolean: {}
+    revoke_flush_confirmation:
+      required: false
+      name: Revoke Flush Confirmation
+      description: Revoke the flush confirmation
+      example: False
+      selector:
+        boolean: {}
+    exec_auto_flush:
+      required: false
+      name: Execute Auto Flush
+      description: Execute an automatic flush
+      example: False
+      selector:
+        boolean: {}

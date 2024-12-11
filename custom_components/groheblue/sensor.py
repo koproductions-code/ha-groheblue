@@ -31,6 +31,7 @@ SENSOR_CONFIG = {
     "Water Running Time (Medium)": {"key": "water_running_time_medium", "unit": "min"},
     "System Error Bitfield": {"key": "System_error_bitfield", "unit": ""},
     "Time Since Last Withdrawal": {"key": "time_since_last_withdrawal", "unit": "min"},
+    "Timestamp": {"key": "timestamp", "unit": "date"},
 }
 
 

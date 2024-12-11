@@ -12,7 +12,7 @@ from .coordinator import GroheDataUpdateCoordinator
 
 DOMAIN = "groheblue"
 _LOGGER = logging.getLogger(__name__)
-
+_LOGGER.setLevel(logging.ERROR)
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
@@ -101,7 +101,43 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         )
 
         await client.dispense(device, tap_type, amount)
+    
+    async def handle_custom_command(call):
+        target = call.data.get("device_id")[0]
+
+        co2_status_reset = call.data.get("co2_status_reset", False)
+        tap_type = call.data.get("tap_type", None)
+        cleaning_mode = call.data.get("cleaning_mode", False)
+        filter_status_reset = call.data.get("filter_status_reset", False)
+        get_current_measurement = call.data.get("get_current_measurement", False)
+        tap_amount = call.data.get("tap_amount", None)
+        factory_reset = call.data.get("factory_reset", False)
+        revoke_flush_confirmation = call.data.get("revoke_flush_confirmation", False)
+        exec_auto_flush = call.data.get("exec_auto_flush", False)
+
+        entry = device_registry.async_get(target)
+        grohe_id = next(iter(entry.identifiers))[1]
+
+        devices = await client.get_devices()
+        device = next(
+            (device for device in devices if device.appliance_id == grohe_id), None
+        )
+
+        await client.custom_command(
+            device,
+            co2_reset=co2_status_reset,
+            filter_reset=filter_status_reset,
+            flush=exec_auto_flush,
+            tap_type=tap_type,
+            tap_amount=tap_amount,
+            clean_mode=cleaning_mode,
+            get_current_measurement=get_current_measurement,
+            revoke_flush_confirmation=revoke_flush_confirmation,
+            factory_reset=factory_reset,
+        )
+
 
     hass.services.async_register("groheblue", "tap_water", handle_tap_water)
+    hass.services.async_register("groheblue", "custom_command", handle_custom_command)
 
     return True

@@ -136,6 +136,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             factory_reset=factory_reset,
         )
 
+        if get_current_measurement:
+            await coordinator.async_refresh()
+
 
     hass.services.async_register("groheblue", "tap_water", handle_tap_water)
     hass.services.async_register("groheblue", "custom_command", handle_custom_command)

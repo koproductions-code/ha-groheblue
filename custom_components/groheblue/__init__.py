@@ -1,6 +1,7 @@
 """__init__.py file for the Grohe Blue integration."""
 
 import logging
+import asyncio
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -86,7 +87,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await hass.config_entries.async_forward_entry_setups(
         entry, ["sensor", "binary_sensor"]
     )
-
+  # Wait for 5 seconds before refreshing
     async def handle_tap_water(call):
         target = call.data.get("device_id")[0]
         tap_type = call.data.get("type")
@@ -135,9 +136,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             revoke_flush_confirmation=revoke_flush_confirmation,
             factory_reset=factory_reset,
         )
-
         if get_current_measurement:
-            await coordinator.async_refresh()
+            loop = asyncio.get_running_loop()
+            loop.call_later(4, lambda: asyncio.create_task(coordinator.async_refresh()))
 
 
     hass.services.async_register("groheblue", "tap_water", handle_tap_water)

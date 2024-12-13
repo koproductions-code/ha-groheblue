@@ -6,32 +6,109 @@ from homeassistant.helpers.device_registry import DeviceEntryType
 
 from . import DOMAIN, GroheDataUpdateCoordinator
 
-# Configuration map for sensors
+from datetime import datetime
+
 SENSOR_CONFIG = {
-    "Remaining CO2": {"key": "remaining_co2", "unit": "%"},
-    "Remaining Filter": {"key": "remaining_filter", "unit": "%"},
-    "Remaining CO2 Liters": {"key": "remaining_co2_liters", "unit": "L"},
-    "Remaining Filter Liters": {"key": "remaining_filter_liters", "unit": "L"},
-    "Cleaning Count": {"key": "cleaning_count", "unit": ""},
-    "Date of Last Cleaning": {"key": "date_of_cleaning", "unit": "date"},
-    "Date of Last CO2 Replacement": {"key": "date_of_co2_replacement", "unit": "date"},
+    "Remaining CO2": {
+        "key": "remaining_co2",
+        "unit": "%",
+        "state_class": "measurement",
+    },
+    "Remaining Filter": {
+        "key": "remaining_filter",
+        "unit": "%",
+        "device_class": "measurement",
+    },
+    "Remaining CO2 Liters": {
+        "key": "remaining_co2_liters",
+        "unit": "L",
+        "device_class": "volume",
+        "state_class": "total",
+    },
+    "Remaining Filter Liters": {
+        "key": "remaining_filter_liters",
+        "unit": "L",
+        "device_class": "volume",
+        "state_class": "total",
+    },
+    "Cleaning Count": {"key": "cleaning_count", "unit": "", "device_class": ""},
+    "Date of Last Cleaning": {
+        "key": "date_of_cleaning",
+        "unit": "date",
+        "device_class": "timestamp",
+    },
+    "Date of Last CO2 Replacement": {
+        "key": "date_of_co2_replacement",
+        "unit": "date",
+        "device_class": "timestamp",
+    },
     "Date of Last Filter Replacement": {
         "key": "date_of_filter_replacement",
         "unit": "date",
+        "device_class": "timestamp",
     },
-    "Power Cut Count": {"key": "power_cut_count", "unit": ""},
-    "Pump Count": {"key": "pump_count", "unit": ""},
-    "Pump Running Time": {"key": "pump_running_time", "unit": "min"},
-    "Operating Time": {"key": "operating_time", "unit": "min"},
-    "Water Running Time (Still)": {"key": "water_running_time_still", "unit": "min"},
+    "Power Cut Count": {
+        "key": "power_cut_count",
+        "unit": "",
+        "device_class": "",
+    },
+    "Pump Count": {"key": "pump_count", "unit": "", "device_class": ""},
+    "Pump Running Time": {
+        "key": "pump_running_time",
+        "unit": "min",
+        "device_class": "duration",
+        "state_class": "measurement",
+    },
+    "Operating Time": {
+        "key": "operating_time",
+        "unit": "min",
+        "device_class": "duration",
+        "state_class": "measurement",
+    },
+    "Water Running Time (Still)": {
+        "key": "water_running_time_still",
+        "unit": "min",
+        "device_class": "duration",
+        "state_class": "measurement",
+    },
     "Water Running Time (Carbonated)": {
         "key": "water_running_time_carbonated",
         "unit": "min",
+        "device_class": "duration",
+        "state_class": "measurement",
     },
-    "Water Running Time (Medium)": {"key": "water_running_time_medium", "unit": "min"},
-    "System Error Bitfield": {"key": "System_error_bitfield", "unit": ""},
-    "Time Since Last Withdrawal": {"key": "time_since_last_withdrawal", "unit": "min"},
-    "Timestamp": {"key": "timestamp", "unit": "date"},
+    "Water Running Time (Medium)": {
+        "key": "water_running_time_medium",
+        "unit": "min",
+        "device_class": "duration",
+        "state_class": "measurement",
+    },
+    "System Error Bitfield": {
+        "key": "System_error_bitfield",
+        "unit": "",
+        "device_class": "",
+    },
+    "Time Since Last Withdrawal": {
+        "key": "time_since_last_withdrawal",
+        "unit": "min",
+        "device_class": "duration",
+        "state_class": "measurement",
+    },
+    "Timestamp": {"key": "timestamp", "unit": "date", "device_class": "timestamp"},
+    "Filter Change Count": {
+        "key": "filter_change_count",
+        "unit": "",
+        "device_class": "",
+    },
+    "Filter Type": {"key": "filter_type", "unit": "", "device_class": "enum"},
+}
+
+FILTER_TYPES = {
+    1: "S_SIZE",
+    2: "ACTIVE_CARBON",
+    3: "ULTRA_SAFE",
+    4: "MAGNESIUM_PLUS",
+    5: "M_SIZE",
 }
 
 
@@ -71,13 +148,29 @@ class GroheSensor(CoordinatorEntity, SensorEntity):
         else:
             self._attr_unit_of_measurement = config["unit"]
 
+        if "device_class" in config.keys() and config["device_class"]:
+            self._attr_device_class = config["device_class"]
+
+        if "state_class" in config.keys() and config["state_class"]:
+            self._attr_state_class = config["state_class"]
+
         self._config = config
         self._appliance_id = appliance_id
 
     @property
     def native_value(self):
         """Return the current value for the sensor."""
-        return self.coordinator.data.get(self._config["key"])
+        api_data = self.coordinator.data.get(self._config["key"])
+
+        if self._config["unit"] == "date":
+            if api_data:
+                return datetime.fromisoformat(api_data)
+
+        if self._config["key"] == "filter_type":
+            if api_data:
+                return FILTER_TYPES.get(api_data, api_data)
+
+        return api_data
 
     @property
     def device_info(self):

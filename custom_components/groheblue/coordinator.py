@@ -61,4 +61,6 @@ class GroheDataUpdateCoordinator(DataUpdateCoordinator):
             "co2_empty": device_data.state.co2_empty,
             "time_since_last_withdrawal": device_data.data_latest.time_since_last_withdrawal,
             "timestamp": device_data.data_latest.timestamp,
+            "filter_change_count": device_data.data_latest.filter_change_count,
+            "filter_type": device_data.params.filter_type,
         }

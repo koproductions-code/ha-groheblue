@@ -87,7 +87,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await hass.config_entries.async_forward_entry_setups(
         entry, ["sensor", "binary_sensor"]
     )
-  # Wait for 5 seconds before refreshing
+    
     async def handle_tap_water(call):
         target = call.data.get("device_id")[0]
         tap_type = call.data.get("type")

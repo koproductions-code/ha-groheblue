@@ -1,5 +1,8 @@
 import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.core import callback
+
+from .options_flow import GroheBlueOptionsFlowHandler
 
 DOMAIN = "groheblue"
 
@@ -23,3 +26,11 @@ class MyIntegrationConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=data_schema, errors=errors
         )
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(
+        config_entry,
+    ) -> GroheBlueOptionsFlowHandler:
+        """Create the options flow."""
+        return GroheBlueOptionsFlowHandler()

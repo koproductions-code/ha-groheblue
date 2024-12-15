@@ -1,11 +1,11 @@
 """__init__.py file for the Grohe Blue integration."""
 
 import logging
-import asyncio
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.httpx_client import get_async_client
 
 from groheblue import GroheClient
 
@@ -13,7 +13,7 @@ from .coordinator import GroheDataUpdateCoordinator
 
 DOMAIN = "groheblue"
 _LOGGER = logging.getLogger(__name__)
-_LOGGER.setLevel(logging.ERROR)
+
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
@@ -53,20 +53,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     email = entry.data.get("email")
     password = entry.data.get("password")
 
-    client = GroheClient(email=email, password=password)
+    httpx_client = get_async_client(hass)
+    httpx_client.cookies.clear()
+
+    client = GroheClient(email=email, password=password, httpx_client=httpx_client)
     await client.login()
 
     devices = await client.get_devices()
 
     coordinators = {}
 
+    polling_interval = entry.options.get("polling_interval", 300)
     for device in devices:
+        device = await client.get_current_measurement(device)
+
         appliance_id = device.appliance_id
         name = device.name
         serial_number = device.serial_number
 
         coordinator = GroheDataUpdateCoordinator(
-            hass, client, appliance_id, serial_number
+            hass, client, appliance_id, serial_number, polling_interval
         )
         await coordinator.async_config_entry_first_refresh()
         coordinators[appliance_id] = coordinator
@@ -87,7 +93,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await hass.config_entries.async_forward_entry_setups(
         entry, ["sensor", "binary_sensor"]
     )
-    
+
     async def handle_tap_water(call):
         target = call.data.get("device_id")[0]
         tap_type = call.data.get("type")
@@ -102,7 +108,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         )
 
         await client.dispense(device, tap_type, amount)
-    
+
     async def handle_custom_command(call):
         target = call.data.get("device_id")[0]
 
@@ -136,12 +142,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             revoke_flush_confirmation=revoke_flush_confirmation,
             factory_reset=factory_reset,
         )
-        if get_current_measurement:
-            loop = asyncio.get_running_loop()
-            loop.call_later(4, lambda: asyncio.create_task(coordinator.async_refresh()))
-
 
     hass.services.async_register("groheblue", "tap_water", handle_tap_water)
     hass.services.async_register("groheblue", "custom_command", handle_custom_command)
+
+    async def update_listener(hass, entry):
+        """Handle options update."""
+        new_polling_interval = entry.options.get("polling_interval", 300)
+        for coordinator in hass.data[DOMAIN][entry.entry_id].values():
+            coordinator.update_polling_interval(new_polling_interval)
+            await coordinator.async_request_refresh()
+
+    entry.async_on_unload(entry.add_update_listener(update_listener))
 
     return True

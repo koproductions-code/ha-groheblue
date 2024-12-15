@@ -7,10 +7,10 @@
         "@koproductions"
     ],
     "requirements": [
-        "groheblue==0.2.1"
+        "groheblue==0.3.2"
     ],
     "integration_type": "hub",
     "iot_class": "cloud_polling",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "config_flow": true
 }

@@ -19,14 +19,16 @@ class GroheDataUpdateCoordinator(DataUpdateCoordinator):
         client: GroheClient,
         appliance_id: str,
         serial_number: str,
+        polling_interval: int,
     ):
         """Initialize the coordinator for a specific device."""
         super().__init__(
             hass,
             _LOGGER,
             name=f"Grohe Blue Data Coordinator {appliance_id}",
-            update_interval=timedelta(minutes=5),
+            update_interval=timedelta(seconds=polling_interval),
         )
+
         self.client = client
         self.appliance_id = appliance_id
         self.serial_number = serial_number  # Store serial number in coordinator
@@ -35,9 +37,11 @@ class GroheDataUpdateCoordinator(DataUpdateCoordinator):
         """Fetch data for this specific appliance ID from GroheClient."""
         devices = await self.client.get_devices()
 
-        device_data = next(
+        old_device_data = next(
             device for device in devices if device.appliance_id == self.appliance_id
         )
+
+        device_data = await self.client.get_current_measurement(old_device_data)
 
         return {
             "serial_number": self.serial_number,
@@ -64,3 +68,8 @@ class GroheDataUpdateCoordinator(DataUpdateCoordinator):
             "filter_change_count": device_data.data_latest.filter_change_count,
             "filter_type": device_data.params.filter_type,
         }
+
+    def update_polling_interval(self, new_interval: int):
+        """Update the polling interval and reschedule updates."""
+        self.update_interval = timedelta(seconds=new_interval)
+        self.async_update_listeners()

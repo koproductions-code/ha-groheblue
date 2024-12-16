@@ -33,4 +33,4 @@ class MyIntegrationConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         config_entry,
     ) -> GroheBlueOptionsFlowHandler:
         """Create the options flow."""
-        return GroheBlueOptionsFlowHandler()
+        return GroheBlueOptionsFlowHandler(config_entry)

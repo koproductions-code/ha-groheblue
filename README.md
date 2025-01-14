@@ -2,6 +2,13 @@
 
 This is a HomeAssistant integration to interact with Grohe Blue Home devices. It is fairly new but functional. If you encounter any bugs, feel free to create an issue. 
 
+## :bangbang: This integration will soon be archived :bangbang: 
+Together with [@Flo-Schilli](https://github.com/Flo-Schilli) I developed an integration implementing all Grohe Smarthome devices, which has more features, cosmetic optimizations and is more stable.
+
+Going forward, this integration won't recieve any updates and may break in the future. I suggest switching to the new integration to avoid any future problems.
+It can be found [here](https://github.com/Flo-Schilli/ha-grohe_smarthome). If you install the new integration, make sure to remove this one from your
+Home Assistant setup to avoid potential conflicts. 
+
 ## Disclaimer
 I am not affiliated with Grohe or the Grohe app in any way. The integration is based on the python-package called "groheblue", which is based on the undocumented Grohe-API. If Grohe decides to change the API in any way, this could break the integration. Even tough I tested this integration with my device for several weeks without any malfunction, I am not liable for any potential issues, malfunctions, or damages arising from using this integration. Use at your own risk!
 
